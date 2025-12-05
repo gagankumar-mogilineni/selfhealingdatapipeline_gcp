@@ -1,0 +1,35 @@
+from pyspark.sql import SparkSession
+import argparse
+
+def run_job(project_id, input_table, output_table):
+    spark = SparkSession.builder \
+        .appName("SelfHealingTransformation") \
+        .getOrCreate()
+
+    # Read from BigQuery
+    # Note: This requires the spark-bigquery-connector to be available on the cluster
+    df = spark.read \
+        .format("bigquery") \
+        .option("table", f"{project_id}.selfhealing..{input_table}") \
+        .load()
+
+    # Write to BigQuery
+    df.write \
+        .format("bigquery") \
+        .option("writeMethod", "direct") \
+        .option("createDisposition", "CREATE_IF_NEEDED") \
+        .option("allowFieldAddition", "true") \
+        .option("allowFieldRelaxation", "true") \
+        .mode("overwrite") \
+        .save(f"{project_id}.output.{output_table}")
+
+    spark.stop()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--project_id", required=True)
+    parser.add_argument("--input_table", required=True)
+    parser.add_argument("--output_table", required=True)
+    args = parser.parse_args()
+
+    run_job(args.project_id, args.input_table, args.output_table)
