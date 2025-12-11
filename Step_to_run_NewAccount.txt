@@ -1,0 +1,14 @@
+# 1. Edit the script and update these variables:
+PROJECT_ID="your-project-id"
+BUCKET_NAME="your-unique-bucket-name"
+
+# 2. Make executable and run:
+chmod +x setup.sh
+./setup.sh
+
+
+
+# Just run these 3 commands:
+chmod +x setup.sh
+./setup.sh
+# Wait ~30 minutes for Composer creation
